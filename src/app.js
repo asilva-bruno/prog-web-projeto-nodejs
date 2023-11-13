@@ -12,11 +12,13 @@ const repositories = [];
 
 app.get("/repositories", (request, response) => {
   // TODO
+  // Listagem
   return response.json( repositories );
 });
 
 app.post("/repositories", (request, response) => {
   // TODO
+  // Criação
   const { title, url, techs } = request.body;
   const repository = {
     id: uuid(),
@@ -34,10 +36,38 @@ app.post("/repositories", (request, response) => {
 
 app.put("/repositories/:id", (request, response) => {
   // TODO
+  // Atualização
+  const { id } = request.params;
+  const { title, url, techs } = request.body;
+
+  // Procurar o index no repositório
+  const findRepositoryIndex = repositories.findIndex( 
+    repository => repository.id == id
+   );
+
+   if ( findRepositoryIndex == -1 ){
+    return response.status( 400 ).json( {erro: 'Repositório inexistente!'} );
+   }
+
+   const repository = {
+    id,
+    title,
+    url,
+    techs,
+
+    // Teste: não atualizar manualmente
+    likes: repositories[ findRepositoryIndex ].likes
+   };
+
+   // Sobrescrever o valor com o novo objeto
+   repositories[ findRepositoryIndex ] = repository;
+
+   return response.json( repository );
 });
 
 app.delete("/repositories/:id", (request, response) => {
   // TODO
+  // Remoção
   const { id } = request.params;
 
   const findRepositoryIndex = repositories.findIndex( 
@@ -55,6 +85,20 @@ app.delete("/repositories/:id", (request, response) => {
 
 app.post("/repositories/:id/like", (request, response) => {
   // TODO
+  // Criação de likes
+  const {id} = request.params;
+
+  const findRepositoryIndex = repositories.findIndex(
+    repository => repository.id == id
+  );
+
+  if ( findRepositoryIndex == -1 ){
+    return response.status( 400 ).json( {error: 'Repositório inexistente!'} ); 
+  }
+  
+  repositories[ findRepositoryIndex ].likes += 1;
+
+  return response.json( repositories[findRepositoryIndex] );
 });
 
 module.exports = app;
